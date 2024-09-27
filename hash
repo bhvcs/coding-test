@@ -94,5 +94,34 @@ HashMap에 담아볼까 생각했지만, 번호의 길이가 길어질 수도 �
 또, 슬라이싱을 줄이기 위해 생각했던 부분인데, phone_book을 정렬하여, 폰번호의 길이까지도 정렬되게끔 하였다. 그러면, 폰번호의 길이와 슬라이싱 해야되는 후보들의 비교를 통해, 후보를 도는 동안 
 어느 시점에는 슬라이싱을 안해도 되는 순간이 생긴다.
 
+4. 의상
 
+import java.util.*;
 
+class Solution{
+    public static int solution(String[][] clothes){
+        HashMap<String, Integer> hm = new HashMap<>();
+        for(String[] cloth: clothes){
+            hm.put(cloth[1], hm.getOrDefault(cloth[1], 0) + 1);
+        }
+        int result = 1;
+        for(Map.Entry<String, Integer> entry: hm.entrySet()){
+            result *= (entry.getValue()+1);
+        }
+        return result-1;
+    }
+}
+
+이 문제를 짧게 요약하면 옷의 종류 중, 1개 또는 0개를 선택해서 옷 조합의 개수를 구하는 문제이다.
+옷의 종류에 따른 분류가 필요하므로 HashMap을 사용하면 좋을 것 같았다. 고민했던 부분은, 같은 종류여도 의상 이름들이 다 있는데, 이들을 어떻게 구분해
+줘야할지였다. 생각해보면, 한 종류에 몇 개의 의상이 있는지만 구하면 계산이 가능하다. 그래서 getOrDefault를 사용해서 각 종류 별로 몇 개의 의상이 있는지
+계산하는 식으로 진행했다.
+
+5. 베스트 앨범
+설계
+HashMap<String, Integer> 에 장르별 총 앨범 수를 세고, sort해서 앨범 순이 많은 순으로 장르들을 정렬한다.
+어떤 장르 순으로 수록할지 정했으니, 장르 안에서 앨범이 많은 노래 두개를 골라내야 한다. 이를 위해선, 장르 별로 앨범을 구분하고, 이들을 각각 앨범 수를 기준으로
+정렬할 필요가 있었다. 이를 위한 또 다른 HashMap을 만들면 될 것 같다는 생각이 들었다. 단, 구조가 조금 복잡한?
+{
+    장르:{
+            {노래 이름, 앨범 수}
