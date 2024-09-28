@@ -178,3 +178,23 @@ hm2: 장르별로 노래들을 구분해서 ArrayList에 담는데 원소를 Int
 HashMap<String, Object> 로 해두고, 값 쪽에 노래의 정보들이 담긴 HashMap<Integer, Integer>를 넣었다.
 HashMap 안에 HashMap을 담을 수 있다는 것을 기억하자. 그리고 내 풀이는 sort에서 Comparator를 넣어줬다.
 이것도 비슷한데, compare(o1, o2)를 직접 구현해주었다.
+
+sort 할 때, compare 기준 만들기
+
+어떤 클래스의 object들을 정렬한다고 해보자. 그러면 Comparable interface를 implement 하도록 하고, compareTo를 구현해야 한다.
+
+다른 방법으로는 Collections.sort( List, Comparator<Object> 객체를 구현)
+ex)
+Collections.sort(list, new Comparator<object>() {
+    @Override
+    public int compare(object o1, object o2) {
+    	// 오름차순
+        return o1.height - o2.height;
+    }
+});
+출처: https://llshl.tistory.com/74 [프로찍먹러:티스토리]
+이런 식으로 Comparator 객체를 구현하는데 그 안에 compare 메서드를 내 입맛에 맞게 오버라이딩하자.
+compare에는 두 개의 인자를 받고 int를 반환 받는다.
+음수라면 두 개 중, 왼쪽의 인자가 먼저, 양수라면 오른쪽의 인자가 먼저 온다. -> 이걸로 오름/내림차순을 정의하자.
+
+내가 짜놓은 sort 코드도 좋아보이니, 한번 더 보자.
