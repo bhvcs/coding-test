@@ -125,3 +125,56 @@ HashMap<String, Integer> 에 장르별 총 앨범 수를 세고, sort해서 앨�
 {
     장르:{
             {노래 이름, 앨범 수}
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+
+class Solution{
+    public static Integer[] solution(String[] genres, int[] plays){
+        HashMap<String, Integer> hm1 = new HashMap<>();
+        HashMap<String, ArrayList<Integer[]>> hm2 = new HashMap<>();
+        ArrayList<Integer[]> genre;
+        for(int i=0; i<genres.length; i++){
+            hm1.put(genres[i], hm1.getOrDefault(genres[i], 0) + plays[i]);
+            Integer[] music = new Integer[]{i, plays[i]};
+            if(!hm2.containsKey(genres[i])){
+                genre = new ArrayList<>();
+                genre.add(music);
+                hm2.put(genres[i], genre);
+            }else{
+                genre = hm2.get(genres[i]);
+                genre.add(music);
+            }
+        }
+        for(Map.Entry<String, ArrayList<Integer[]>> entry: hm2.entrySet()){
+            ArrayList<Integer[]> arrList = entry.getValue();
+            arrList.sort(Comparator.<Integer[]>comparingInt(o -> o[1]).reversed().
+                        thenComparing(o -> o[0]));
+        }
+
+        ArrayList<String> keySet = new ArrayList<>(hm1.keySet());
+        keySet.sort(Comparator.comparingInt(o -> hm1.get(o)).reversed());
+        ArrayList<Integer> result = new ArrayList<>();
+        for(String key: keySet){
+            ArrayList<Integer[]> tmp = hm2.get(key);
+            result.add(tmp.get(0)[0]);
+            if (tmp.size() < 2) continue;
+            result.add(tmp.get(1)[0]);
+        }
+        return result.toArray(new Integer[0]);
+    }
+}
+
+hm1: 장르별로 앨범 수들을 합산한 기록을 담음
+hm2: 장르별로 노래들을 구분해서 ArrayList에 담는데 원소를 Integer[2] 짜리로 해서, 첫번째는 노래 고유번호, 두번째 원소에는 앨범 수를 기록했다.
+그리고 hm2의 모든 키-값을 돌면서, 값에 있는 ArrayList를 정렬시킨다. 이는 같은 장르 내에서 노래들을 앨범수를 기준으로 정렬하기 위한 작업니다.
+그래서 sort를 하는데, Collection의 sort 함수에 Comparator을 넣어준다. 이 부분은 꼭 기억하자.
+다음에는 hm1을 sort하고 각 장르들을 돈다. 장르라는 키를 통해서 노래들이 크기 순으로 정렬된 hm2에 접근하여, 노래 번호를 출력한다.
+**sort
+
+다른 사람의 풀이 중 배울점:
+HashMap<String, Object> 로 해두고, 값 쪽에 노래의 정보들이 담긴 HashMap<Integer, Integer>를 넣었다.
+HashMap 안에 HashMap을 담을 수 있다는 것을 기억하자. 그리고 내 풀이는 sort에서 Comparator를 넣어줬다.
+이것도 비슷한데, compare(o1, o2)를 직접 구현해주었다.
