@@ -1,0 +1,67 @@
+1. 같은 숫자는 싫어
+
+import java.util.*;
+
+class Solution{
+    public static Integer[] solution(int[] arr){
+        int prev = -1;
+        Queue<Integer> queue = new LinkedList<>();
+        for(int i=0; i<arr.length; i++){
+            if(prev != arr[i]){
+                queue.offer(arr[i]);
+                prev = arr[i];
+            }
+        }
+        return queue.toArray(new Integer[0]);
+    }
+}
+
+queue를 구현한 구현체로 LinkedList가 있다. offer로 집어넣고, poll로 빼낸다. peek는 뺴내지 않고도 반환해준다.
+전에 hash를 풀면서 배웠는데, Collections를 사용할 때, toArray(new Integer[0])을 쓰면 배열로 변환이 간편하다.
+다른 문제풀이:
+내 코드가 좋아보였음. 근데 Stack<Integer> 을 반환해도 맞게 되더라?
+
+2. 기능개발
+
+import java.util.*;
+
+class Solution{
+    public static int[] solution(int[] progresses, int[] speeds){
+        ArrayList<Integer> result = new ArrayList<>();
+        Queue<Integer> queue = new LinkedList<>();
+        Arrays.stream(progresses).boxed().forEach(queue::offer);
+        int days = 1;
+        int seq = 0;
+        int nums = 0;
+        
+        while(!queue.isEmpty()){
+            if(queue.peek() + days * speeds[seq] >= 100){
+                queue.poll();
+                nums++;
+                seq++;
+            }else{
+                if(nums != 0){
+                result.add(nums);
+                nums = 0;
+                }
+                days++;
+            }   
+        }
+        if(nums > 0) result.add(nums);
+        int size = result.size();
+        int[] answer = new int[size];
+        for(int i=0; i<size; i++){
+            answer[i] = result.get(i).intValue();
+        }
+        return answer;
+    }
+}
+
+이번 문제에선 배운 점이 많았음.
+Arrays.stream(progresses).boxed().forEach(queue::offer); 배열을 Qeueu으로 바꾸려고 쓴 코드. 비슷한 과정으로 Arrays.stream, collect 메서드를 통해 int[] -> List<Integer>로 바꾸고 Queue로 바꿔도 된다.
+queue::offer는 사용하고 싶은 메서드가 있을 때, 해당 메서드가 있는    인스턴스::메서드 로 사용한다. 찾아보다가 .toArray(Integer[]::new) 처럼 ClassName::메서드도 있다. 이때는 static method여야 하는듯.
+if(nums > 0) result.add(nums);
+이 코드도 중요하다. 마지막에 다 처리되고 끝났는지 확인하는 코드이고 자주 사용되는 로직.
+
+** 마지막까지 처리가 잘 되었는지 확인하는 것이 매우 중요함. 잘 안보이기 때문임. 주의해서 검토!!
+ArrayList<Integer> -> int[] 로 바꾸기 위한 코드도 있는데 이건 일부러 이렇게 함. 다른 사람 풀이를 보는 중 이런 풀이가 있어서 해봤다.
