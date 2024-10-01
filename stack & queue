@@ -71,4 +71,31 @@ ArrayList<Integer> -> int[] 로 바꾸기 위한 코드도 있는데 이건 일�
 그리고 Arrays.stream(days).filter(i -> i!=0).toArray(); 로 0이 아닌 값들을 stream을 사용해 새로운 array로 만들어준다.
 좋은 발상과 방법인 것 같다.
 
+3. 올바른 괄호
 
+import java.util.*;
+
+class Solution{
+    public static boolean solution(String s){
+        Stack<Character> stack = new Stack<>();
+        for(int i=0; i<s.length(); i++){
+            if(s.charAt(i) == '('){
+                stack.push(s.charAt(i));
+            }
+            else if(stack.isEmpty()) return false;
+            else{
+                stack.pop();
+            }
+        }
+        if(stack.isEmpty()) return true;
+        return false;
+    }
+}
+
+이 문제는 코드 자체가 설명인 것 같다.
+하나 배운 것은, 처음에 primitive 자료형과 wrapper class 자료형은 자동 변환이 안되는 줄 알았다. 하지만
+primitive에서 wrapper class로 auto boxing이 된다는 것을 알았다. 그래서 stack.push(s.charAt(i)) 에서 인자에는 char이지만 정상 동작한다는 것을 알았다.
+하지만 int[] 에 Integer를 넣는 것처럼 그 반대는 불가능하다.
+
+다른 사람의 풀이:
+굳이 스택을 쓰지 않더라도, ( 와 ) 이 등장한 횟수를 빼면 0이 나오는 것을 잘 이용해서 풀 수도 있다.
