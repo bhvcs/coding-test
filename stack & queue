@@ -99,3 +99,105 @@ primitive에서 wrapper class로 auto boxing이 된다는 것을 알았다. 그�
 
 다른 사람의 풀이:
 굳이 스택을 쓰지 않더라도, ( 와 ) 이 등장한 횟수를 빼면 0이 나오는 것을 잘 이용해서 풀 수도 있다.
+
+
+4. 프로세스
+
+import java.util.*;
+
+class Solution{
+    public static int solution(int[] priorities, int location){
+        Queue<Process> queue = new LinkedList<>();
+        Arrays.stream(priorities).boxed().map(o -> new Process(o))
+            .forEach(queue::offer);
+        Queue<Integer> priorities = new PriorityQueue<>(Collections.reverseOrder());
+        Arrays.stream(priorities).boexed().forEach(priorityQueue::offer);
+        int seq = 0, loc = -1;
+        Process proc;
+        while(true)[
+            proc = queue.poll();
+            loc = proc.getLocation();
+            if(proc.getPriority() == priorityQueue.peek()){
+                seq++;
+                if(proc.getLocation() == location){
+                    return seq;
+                }else{
+                    priorityQueue.poll();
+                }
+            }else{
+                queue.offer(proc);
+        }
+    }
+}
+
+class Process{
+    static int seq = 0;
+    int priority;
+    int location;
+
+    public Process(int priority)[
+        this.priority = priority;
+        this.location = Process.seq++;
+    }
+    public int getLocation(){
+        return this.location;
+    }
+    public int getPriority(){
+        return this.priority;
+    }
+}
+
+이 문제에서는 프로세스라는 것이, 우선 순위뿐 아니라, 처음 배열로 주어질 때의 인덱스까지 자신의
+정보로 사용한다. 그래서 두 개의 정보를 가진 클래스를 만들고, 객체로써 관리하는 것이 좋아보였다.
+배운 점은 Solution.java라는 파일이기 때문에 Process 클래스를 public 으로 만들 수 없다.
+static 변수를 생성자에서 쓸 수 있고, 클래스 이름으로 접근한다. 
+stream을 사용할 떄, map으로 원소를 어떤 객체로 변형하기에 좋으며, forEach는 각 요소에 어떤 행위를
+하기가 좋다. 비슷해보이지만 forEach는 stream에서 종료 연산 느낌. 반환값이 void라는 말임.
+Queue<Integer> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
+여기서 Collections.reverseOrder() 을 기재하면 내림차순으로 Priority Queue,
+아무것도 없다면 default로 오름차순의 Priority Queue임.
+
+5. 다리를 지나는 트럭 (**다시 풀어보고 내 답변을 완전히 실력으로 쌓기 원함)
+
+import java.util.*;
+
+class Solution {
+    public static int solution(int bridge_length, int weight, int[] truck_weights) {
+        int answer = 0;
+        int outTruck = 0;
+        int inTruck = 0;
+        int bridgeWeights = 0;
+        Queue<Integer> bridge = new LinkedList<>();
+        Queue<Integer> trucks = new LinkedList<>();
+        for(int i=0; i<bridge_length; i++) bridge.offer(0);
+        for(int i=0; i<truck_weights.length; i++) trucks.offer(truck_weights[i]);
+        while(!trucks.isEmpty()){
+            answer++;
+            outTruck = bridge.poll();
+            bridgeWeights -= outTruck;
+            if(bridgeWeights + trucks.peek() <= weight){
+                inTruck = trucks.poll();
+                bridge.offer(inTruck);
+                bridgeWeights += inTruck;
+            }
+            else bridge.offer(0);
+        }
+        return answer+bridge_length;
+    }
+}
+
+내 풀이의 핵심은 건너야 되는 트럭들을 담은 큐, 다리를 나타내는 큐이다.
+다리에는 다 0으로 채워넣고, 하나씩 빠질때마다 answer(소요시간)을 1 증가시킨다.
+시간이 1초지날 때마다, 다리에서 한 칸을 뺀다. 이 때, 빠진 무게와 다리가 버틸 수 있는 weight을
+고려해 다음 truck이 들어갈 수 있는지 확인하고, 있다면 트럭큐에서 하나 투입시키고,
+없다면 0을 투입시킨다. 마지막 while 조건에선 트럭큐가 비어있다면, 즉, 마지막 트럭이 다리에
+올라가자마자 종료된다. 하여 bridge를 완전히 건널 수 있는 시간만큼 더해주고 끝을 낸다.
+
+어떤 문제나, while을 쓴다면 초기 명령문들이 제일 중요한 것 같다. 이 문제로 따지면
+트럭이 나갈 때, 소요 시간이 1 증가할 때, 공통적으로 취하는 행동이 뭔지 정의하는 것이
+가장 핵심적인 부분이다.
+
+다른 사람 풀이:
+나도 처음에 클래스로 만들어 풀려고 했는데, 그러면 알고리즘 아이디어에 대한 공부가 잘되지 
+않는 것 같아서 이렇게 진행했다. 개인적으로 내 풀이가 제일 좋아보인다.
+
