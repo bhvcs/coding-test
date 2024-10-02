@@ -1,0 +1,70 @@
+heap
+
+장점:
+빠른 삽입 및 삭제( O(lgN) )
+
+단점:
+임의의 요소에 개별적인 접근이 힘들고, 삽입이든 삭제든, 계속 정렬을 유지해야 해서, 오버헤드가 발생
+
+PriorityQueue 사용
+
+1. 더 맵게
+
+import java.util.*;
+
+class Solution{
+    public static int solution(int[] scoville, int K){
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        for(int s: scoville) minHeap.offer(s);
+        int a, answer = 0;
+        
+        while(minHeap.peek() < K){
+            a = minHeap.poll();
+            if(minHeap.isEmpty()) return -1;
+            a += 2 * minHeap.poll();
+            minHeap.offer(a);
+            answer++;
+        }
+        return answer;
+    }
+}
+
+PriorityQueue를 사용했다.
+
+2. 디스크 컨트롤러
+
+import java.util.*;
+
+class Solution{
+    public static int solution(int[][] jobs){
+        int time = 0, sum = 0;
+        Queue<Integer[]> jobQ = new LinkedList<>();
+        PriorityQueue<Integer[]> minHeap = new PriorityQueue<>(
+            (o1, o2)->(o1[1]-o2[1]));
+        Arrays.sort(jobs, ((o1, o2)->(o1[0]-o2[0])));
+        for(int[] job: jobs){
+            Integer[] tmp = Arrays.stream(job).boxed().toArray(Integer[]::new);
+            jobQ.offer(tmp);
+        }
+        while(!(jobQ.isEmpty() && minHeap.isEmpty())){
+            if((!jobQ.isEmpty()) && (time >= jobQ.peek()[0])){
+                Integer[] job = jobQ.poll();
+                minHeap.offer(job);
+            }
+            else if(!minHeap.isEmpty()){
+                Integer[] job = minHeap.poll();
+                sum += (time - job[0] + job[1]);
+                time += job[1];
+            }else time++;
+        }
+        return sum / jobs.length;
+    }
+}
+
+이 문제를 풀면서 sort 메서드에 좀 더 친숙해졌다. int 를 Integer 배열에 넣는 것은 불가능하니 인지.
+while문을 돌때마다 time을 증가시킨게 아닌 특정 상황에서만 time을 증가시키는 것이 코드를 깔끔하게 해준 것 같음.
+현재 시간의 실행 대기 목록에서 소요 시간이 최소인 것을 고르기 위해 min Heap을 사용한 것이 풀이의 핵심.
+
+다른 사람의 풀이:
+올려놓은 코드에 반영했는데, 구조는 얼추 비슷하지만 마지막 정답을 반환할 때 방식이 좀 달랐다. 나는 처음에, 각 job의 (대기시간 + 소요시간)을 ArrayList에 담고, 마지막에 다 더해 평균을 냈다.
+하지만 문제는 합만 구하면 충분했고, ArrayList에 넣는 대신 바로 sum에다 넣으면 불필요한 자원 낭비도 막고, 사건도 단축시킬 수 있었다.
