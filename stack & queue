@@ -201,3 +201,43 @@ class Solution {
 나도 처음에 클래스로 만들어 풀려고 했는데, 그러면 알고리즘 아이디어에 대한 공부가 잘되지 
 않는 것 같아서 이렇게 진행했다. 개인적으로 내 풀이가 제일 좋아보인다.
 
+
+6. 주식가격
+
+import java.util.*;
+
+class Solution{
+    public static int[] solution(int[] prices){
+        int len = prices.length;
+        int[] answers = new int[len];
+        Queue<Integer> queue = new LinkedList<>();
+        for(int p: prices){
+            queue.offer(p);
+        }
+        Stack<Integer[]> stack = new Stack<>();
+        int time = 1;
+        Integer[] tmp, arr;
+        while(!queue.isEmpty()){
+            if(stack.isEmpty() || stack.peek()[0] <= queue.peek()){
+                arr = new Integer[2];
+                arr[0] = queue.poll();
+                arr[1] = time++;
+                stack.push(arr);
+            }else{
+                tmp = stack.pop();
+                int idx = tmp[1]-1;
+                tmp[1] = time - tmp[1];
+                answers[idx] = tmp[1].intValue();
+            }
+        }
+        while(!stack.isEmpty()){
+            tmp = stack.pop();
+            int idx = tmp[1]-1;
+            
+            if(tmp[1] == len) tmp[1] = 0;
+            else tmp[1] = len - tmp[1];
+            answers[idx] = tmp[1];
+        }
+        return answers;
+    }
+}
