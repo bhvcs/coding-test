@@ -1,0 +1,86 @@
+sort
+
+1. K번째 수
+import java.util.*;
+
+class Solution{
+    public static int[] solution(int[] array, int[][] commands){
+        int[] tmpArr;
+        int[] answer = new int[commands.length];
+        for(int i=0; i<commands.length; i++){
+            tmpArr = Arrays.copyOfRange(array, commands[i][0]-1, commands[i][1]);
+            Arrays.sort(tmpArr);
+            answer[i] = tmpArr[commands[i][2]-1];
+        }
+        return answer;
+    }
+}
+간단하다.
+
+2.
+import java.util.*;
+
+class Solution{
+    public static String solution(int[] numbers){
+        StringBuilder sb = new StringBuilder();
+        String[] arr = Arrays.stream(numbers).mapToObj(Integer::toString).toArray(String[]::new);
+        Arrays.sort(arr, new Comparator<String>(){
+            @Override
+            public int compare(String o1, String o2){
+                int a, b, cmp;
+                int i;
+                if(o1.length() == o2.length()) return Integer.parseInt(o2) - Integer.parseInt(o1);
+                else if(o1.length() > o2.length()){
+                    while(Integer.parseInt(o1) < 1000){
+                        o1 += "0";
+                    }
+                }else{
+                    while(Integer.parseInt(o2) < 1000){
+                        o2 += "0";
+                    }
+                }
+                
+                for(int j=0; j<4; j++){
+                    cmp = (int)(o2.charAt(j % o2.length())-'0') - (int)(o1.charAt(j % o1.length())-'0');
+                    if(cmp != 0) return cmp;
+                }
+                return -1;
+            }
+        });
+        
+        for(String n: arr){
+            sb.append(n);
+        }
+        
+        if(sb.charAt(0) == '0') return "0";
+        
+        return sb.toString();
+    }
+}
+이게 내 첫번째 코드이다. if(sb.charAt(0) == '0') return "0"; 이 부분은 chatgpt에게 도움을 받았다. 이건 Comparator의 원리를 제대로 이해하지 못해서 복잡하게 작성했다.
+근데 이게 테스트 케이스들을 왜 통과하지 못하는지는 알아내지 못했다.
+
+import java.util.*;
+
+class Solution{
+    public static String solution(int[] numbers){
+        String[] arr = Arrays.stream(numbers).mapToObj(Integer::toString).toArray(String[]::new);
+        Arrays.sort(arr, new Comparator<String>(){
+            @Override
+            public int compare(String o1, String o2){
+                return Integer.parseInt(o2+o1) - Integer.parseInt(o1+o2);
+            }
+        });
+        StringBuilder sb = new StringBuilder();
+        for(String a: arr){
+            sb.append(a);
+        }
+        String answer = sb.toString();
+        if(answer.charAt(0) == '0') return "0";
+        return answer;
+    }
+}
+이 코드는 chatgpt가 설계해준 코드이다.
+override한 compare 함수는 두 숫자 중 뭐가 앞에 올지에 대한 함수이다. 그래서 사실 두 숫자를 다른 순서로 붙였을 때, 어느게 더 큰지만 판단하면 되는 것이었다.
+뭔가, 배열 전체를 하나의 기준으로 정렬하려고 했던 것인지 이런 생각 자체를 하지 못한 것 같다.
+다음에 compare 함수를 override할 때는, 두 개 중, 어느 것이 먼저 올지에 대한 생각에 집중할 것이다!!.
