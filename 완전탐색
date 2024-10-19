@@ -77,4 +77,68 @@ class Solution{
 new Comparator를 정의하고
 이를 Arrays.stream(*Array*).max(*Comparator*).orElse(-1); 식으로 하는 것이다. max()애서 멈추면 Optional<Integer>로 끝나니깐 getAsInt를 하던, orElse를 해야된다.
 
+3. 소수 찾기
 
+import java.util.*;
+
+class Solution{
+    public static int solution(String numbers){
+        String[] tmp = numbers.split("");
+        Integer[] nums = Arrays.stream(tmp).map(Integer::valueOf).toArray(Integer[]::new);
+        Arrays.sort(nums);
+        int x = nums.length;
+        int max = nums[0];
+        int answer = 0;
+        for(int i=1; i<x; i++){
+            max += nums[i] * Math.pow(10, i);
+        }
+        int[] n_list = new int[max+1];
+        n_list[0] = -1;
+        
+        for(int i=3; i<=(int)Math.sqrt(max); i+=2){
+            int j = i;
+            while(i*j <= max){
+                n_list[i*j] = -1;
+                j+=2;
+            }
+        }
+        for(int i=2; i<=max; i++){
+            if(i%2 == 0 && i!=2) continue;
+            if(n_list[i] != -1){
+                if(canBeMade(nums, i)){
+                    answer++;
+                }
+                
+            }
+        }
+        return answer;
+        
+    }
+    public static boolean canBeMade(Integer[] nums, int q){
+        int k = q;
+        ArrayList<Integer> list = new ArrayList<>();
+        while(k > 0){
+            list.add(k % 10);
+            k = k / 10;
+        }
+        Collections.sort(list);
+        int j = 0;
+        for(int i=0; i<nums.length; i++){
+            if(list.get(j).intValue() == nums[i].intValue()) j++;
+            else if(list.get(j).intValue() < nums[i].intValue()) return false;
+            if(j == list.size()) return true;
+        }
+        return false;
+    }
+}
+
+2를 제외한 짝수는 무조건 소수가 아니다. 그래서 n_list에 굳이 -1을 표시하지 않았다. 그리고 i * j는 합성수의 형식 -> 소수가 아니므로 -1을 표시한다.
+근데 i가 Math.sqrt(max) 보다 커지면 굳이 검사할 필요 없다. i * j가 max보다 커지기 때문이다. 처음에는 i * j가 max보다 작을 때만 검사하도록 해서
+괜찮을 줄 알았는데, overflow가 나왔다. i * j의 계산 결과가 int 자료형 범위보다 커질 때 발생하는 것이다. Math.sqrt를 사용하면 어차피 max까지 커질일도 없으며,
+또한 for 문에서 불필요한 부분까지 돌지 않아도 되서 더 좋다.
+
+다른 사람의 풀이:
+처음으로 다른 사람의 풀이 먼저 봤다. 내 코드가 시간 초과가 되는 것을 보고 뭐가 문제인지 몰라 봤던 것이다. 결론적으로는 내부에 무한 루프가 있어서
+나왔던 결과이다.
+내 코드와의 차이는 numbers 문자열에서 만들어낼 수 있는 숫자들을 모은 배열을 만드는 것이다. 잘 알려져있는 재귀 순열 알고리즘을 응용해서 구현한 풀이었다.
+순열 알고리즘을 이렇게 응용할 수도 있구나 하는 생각이 컸다. 많은 것을 배운 풀이었다.
