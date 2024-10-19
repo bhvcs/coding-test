@@ -142,3 +142,25 @@ class Solution{
 나왔던 결과이다.
 내 코드와의 차이는 numbers 문자열에서 만들어낼 수 있는 숫자들을 모은 배열을 만드는 것이다. 잘 알려져있는 재귀 순열 알고리즘을 응용해서 구현한 풀이었다.
 순열 알고리즘을 이렇게 응용할 수도 있구나 하는 생각이 컸다. 많은 것을 배운 풀이었다.
+
+4. 카펫
+
+class Solution{
+    public static int[] solution(int brown, int yellow){
+        int[] answer = new int[2];
+        for(int i=1; i<=(int)Math.sqrt(yellow); i++){
+            if(yellow % i != 0) continue; // 가로 세로로 나누어 떨어지지 않음
+            int l = yellow / i;
+            int req = 2 * (i + l) + 4;
+            if(req == brown){
+                answer[0] = l + 2;
+                answer[1] = i + 2;
+            }
+        }
+        return answer;
+    }
+}
+
+쉬웠다. 노란색 영역이 정해지면 갈색 영역의 기댓값이 정해진다. 이를 기반으로 문제를 풀었다. 처음에 answer 배열에 l+2, i+2를 안했었는데 
+전체 영역의 가로, 세로 길이가 아닌 노란색 영역의 변의 길이를 도출한 것이었다. 내가 구한 것이 정확히 무엇인지 알고하자!.
+
