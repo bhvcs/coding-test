@@ -215,3 +215,67 @@ ans에 저장된 값을 max 함수로 비교해서 매번 최댓값을 ans에 �
 나는 go boolean 변수를 사용해서 answerList의 개수를 세는 횟수를 줄였다. 이것도 이를 적용해서, go가 false일 때만 max 계산을 해줘도 괜찮을 것 같다.
 (어차피 여기가 마지막은 아닌데 굳이 max 계산을 안해줘도 되니깐)
 
+6. 전력망을 둘로 나누기
+
+import java.util.*;
+
+class Solution {
+    public static int[] visited;
+    public static int solution(int n, int[][] wires) {
+        HashMap<Integer, HashSet<Integer>> map = new HashMap<>();
+        for(int[] wire: wires){
+            HashSet<Integer> hs = map.getOrDefault(wire[0], new HashSet<Integer>());
+            hs.add(wire[1]);
+            map.put(wire[0], hs);
+            hs = map.getOrDefault(wire[1], new HashSet<Integer>());
+            hs.add(wire[0]);
+            map.put(wire[1], hs);
+        } // 각 wire들 저장
+        visited = new int[wires.length+2];
+        int diff = n;
+        for(int[] wire: wires){
+            map.get(wire[0]).remove(wire[1]);
+            map.get(wire[1]).remove(wire[0]);
+            canGo(1, map);
+            map.get(wire[0]).add(wire[1]);
+            map.get(wire[1]).add(wire[0]);
+            diff = Math.min(diff, Math.abs(n - 2 * count()));   
+        }
+        return diff;
+    }
+    public static int count(){
+        int n = 0;
+        for(int i=1; i<visited.length; i++){
+            if(visited[i] == 1){
+                n++;
+                visited[i] = 0;
+            }
+        }
+        return n;
+    }
+    public static void canGo(int start, HashMap<Integer, HashSet<Integer>> map){
+        if(visited[start] == 1) return; //이미 방문한 노드
+        visited[start] = 1;
+        HashSet<Integer> hs = map.get(start);
+        if(hs.isEmpty()) return;
+        Iterator<Integer> it = hs.iterator()
+        while(it.hasNext()){
+            canGo(it.next(), map);
+        }
+    }
+}
+
+전에 HashSet 안에 HashSet을 넣은 풀이가 있었는데 그걸 생각해서 풀었다.
+wire가 n-1개라는 건, 하나 끊으면 무조건 둘로 나뉘어진다는 뜻. for문으로 wire 하나씩 끊고 diff를 계산한다.
+HashMap과 HashSet을 쓴건 해당 노드에서 어디로 갈 수 있는지 빠르게 받을 수 있도록 하기 위함이다. 이게 아니라면 for문으로 wire들을 돌면서
+wire[0]과 wire[1]을 다 검사해야겠지.
+
+다른 사람의 풀이:
+HashMap과 HashSet을 썼는데, 이차원 배열을 써서 표현하는게 효율적이어 보인다.
+import java.util.*;
+
+for (int[] wire : wires) {
+            int a =  wire[0], b = wire[1];
+            map[a][b] = map[b][a] = 1;
+        }
+그리고 dfs헐 때, queue를 이용하는 풀이도 다음에 해볼것!!
