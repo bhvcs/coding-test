@@ -278,4 +278,5 @@ for (int[] wire : wires) {
             int a =  wire[0], b = wire[1];
             map[a][b] = map[b][a] = 1;
         }
+dfs(depth-first-search) 모든 노드를 검사.
 그리고 dfs헐 때, queue를 이용하는 풀이도 다음에 해볼것!!
