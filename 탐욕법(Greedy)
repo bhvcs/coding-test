@@ -1,0 +1,38 @@
+1. 체육복
+
+import java.util.*;
+import java.util.stream.*;
+
+class Solution{
+    public static int solution(int n, int[] lost, int[] reserve){
+        Arrays.sort(lost);
+        Arrays.sort(reserve);
+        Set<Integer> lostHs = Arrays.stream(lost).boxed().collect(Collectors.toSet());
+        Set<Integer> reserveHs = Arrays.stream(reserve).boxed().collect(Collectors.toSet());
+        for(int l: lost){
+            if(reserveHs.contains(l)){
+                reserveHs.remove(l);
+                lostHs.remove(l);
+            }
+        }
+        Iterator<Integer> it = lostHs.iterator();
+        int lostAnyway = lostHs.size();
+        while(it.hasNext()){
+            int person = it.next();
+            if(reserveHs.contains(person-1)){
+                lostAnyway--;
+                reserveHs.remove(person-1);
+            }else if(reserveHs.contains(person+1)){
+                lostAnyway--;
+                reserveHs.remove(person+1);
+            }
+        }
+        return n - lostAnyway;
+    }
+}
+
+배운점: java.util.*은 java.util.stream.Collectors를 포함 안함.
+Arrays.stream(lost).boxed().collect(Collectors.toSet())로 Set 인터페이스 구현체로 반환해줌. HashSet으로 반환하는게 아니라, HashSet으로 쓰고 싶으면 new HashSet<>(lostHs)로 HashSet으로 바꿔야함.
+근데 내부적으로는 HashSet일 가능성이 크다고 gpt가 말해줌.
+HashSet이나 HashMap을 쓰는 이유는 조회가 쉬워서임. 배열을 써서 해도 됐지만 HashSet, HashMap에 익숙해지고자 했다.
+
