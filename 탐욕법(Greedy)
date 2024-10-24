@@ -121,3 +121,29 @@ stack.push(charAt(i))
 
 앞으로 재귀를 쓸 일이 있다면, stack 구조체 사용을 생각해보자!!!.
 
+4. 구명보트
+
+import java.util.*;
+
+class Solution{
+    public static int solution(int[] people, int limit){
+        Arrays.sort(people);
+        int i=0, j = people.length - 1;
+        int heavy, boat = 0;
+        while(i <= j){
+            heavy = people[j];
+            if(i < j && (heavy + people[i] <= limit)){
+                i++;
+            }
+            j--;
+            boat++;
+        }
+        return boat;
+    }
+}
+
+처음에는 배열로 안하고 Deque 구현체인 LinkedList를 이용해서 진행했다. 결과는 잘 나오는 듯 했으나, 효율성 테스트에서 통과하지 못했다.
+그래서 배열, i, j 로 진행했다. 자료구조를 사용하는 것은 좋지만, 드라마틱하게 좋아지는 것이 아니라면 배열을 쓰자.
+
+다른 사람의 풀이:
+for문을 for(; i < j; j--) 를 사용하면 내 기존 코드보다 한줄은 줄어든다.
