@@ -36,3 +36,88 @@ Arrays.stream(lost).boxed().collect(Collectors.toSet())로 Set 인터페이스 �
 근데 내부적으로는 HashSet일 가능성이 크다고 gpt가 말해줌.
 HashSet이나 HashMap을 쓰는 이유는 조회가 쉬워서임. 배열을 써서 해도 됐지만 HashSet, HashMap에 익숙해지고자 했다.
 
+2. 조이스틱
+
+import java.util.*;
+
+class Solution{
+    public static int solution(String name){
+        int[] letters = new int[name.length()];
+        int x, y, z, cnt = 0;
+        for(int i=0; i<name.length(); i++){
+            x = name.charAt(i) - 'A';
+            if(x == 0) continue;
+            y = 'Z' - name.charAt(i) + 1; // Z로 이동할 떄 벌써 1회 소모
+            cnt += Math.min(x, y); // 그 문자를 만드는 최소 횟수
+            letters[i] = 1;
+        }
+        if(cnt == 0) return cnt;
+        return cnt + dfs(0, 0, letters);
+    }
+    public static int dfs(int seq, int move, int[] letters){
+        int len = letters.length;
+        int n = 0;
+        for(int i=0; i<len; i++){
+            if(letters[i] == 1) n++;
+        }
+        if(n == 0)  return move-1; // 더이상 안움직여도 되는지
+        if(move > len) return move; // len을 넘어간 순간 애초에 잘못된 길을 갔다는 것
+        
+        boolean change = false;
+        if(letters[seq] == 1){
+            letters[seq] = 0;
+            change = true;
+        }
+        move++;
+        int a;
+        // int[] arr = Arrays.copyOf(letters, letters.length);
+        if(seq + 1 == len) a = dfs(0, move, letters);
+        else a = dfs(seq+1, move, letters);
+        
+        int b;
+        if(seq-1 == -1) b = dfs(len-1, move, letters);
+        else b = dfs(seq-1, move, letters);
+        if(change) letters[seq] = 1;
+        return Math.min(a, b);
+    }
+}
+
+배운점: 재귀를 하더라도 letters는 자바의 배열, 즉, 참조 객체라서 callee에서 변경되면 caller에서도 변경이 적용된다. 그래서 이를 해결하기 위해 copyOf를 했다.
+하지만 이러면 재귀가 깊어질 때마다 배열이 생겨날 것이고 메모리 낭비가 심해질 것이라 사료된다.
+현재 코드는 이를 보완했는데 letters의 변경사항을 return 할 떄 원상 복귀 시키는 형식으로 수행했다. 이 흐름은 혼자할 때, 확신이 잘 안 서고 불편했다.
+내 안에 체화하도록 노력하자.
+
+
+3. 큰 수 만들기
+
+class Solution{
+    public static String solution(String number, int k){
+        return dfs(k, number);
+    }
+    public static String dfs(int k, String number){
+        if(number.length() == k) return ""; // 남은거 다 버리기
+        if(k==0) return number; // 더이상 버릴게 없으니 남은거 다 들고가기
+        int maxIdx = 0;
+        for(int i=0; i<k+1; i++)
+            if(number.charAt(maxIdx) < number.charAt(i)) maxIdx = i;
+        if(maxIdx == number.length() - 1) return number.substring(maxIdx);
+        return number.substring(maxIdx, maxIdx + 1) + dfs(k-maxIdx, number.substring(maxIdx+1));
+    }
+}
+
+맨 앞에서부터 검사하면서 k 길이만큼 검사, 그중에 버릴게 있는지 반복해서 고르는 dfs를 적용한 코드이다.
+이 문제를 풀다가 마지막 테스트 케이스를 통과하지 못해서, 다른 곳을 찾아봤는데, "10"과 같은 코드에서 인덱스를 넘어가는 오류가 났다는 것을 알게됐다.
+런타임 에러가 발생한다는 사실은 알았는데 인덱스가 문제일지 생각도 못했다. 앞으로 런타임 에러다, 라고 하면 인덱스가 넘어가게 되는 에러가 없는지 확인해봐야 한다.
+어쩔 때, 인덱스가 넘어갈지 잘 고민해보는게 알고리즘 정확도에 큰 기여를 해줄 것이다.
+
+다른 사람의 풀이:
+나와 로직이 비슷한데
+while(!stack.isEmpty() && stack.peek() < charAt(i))
+    stack.pop();
+stack.push(charAt(i))
+형식으로 검사하고 있는 단어 전에 작은 것들이 있다면 다 없애버리고 있다. 물론 k가 0이 될 때까지만. stack을 쓰면 재귀를 쓰지 않아도 되어서 되게
+배울점이 많은 코드이다. 대신 내 코드는 k만큼 한번에 검사하기 때문에, 약간은 더 빠를 수도 있다. 하지만 재귀를 사용하지 않는 것이 나에겐 더
+좋게 다가온다.
+
+앞으로 재귀를 쓸 일이 있다면, stack 구조체 사용을 생각해보자!!!.
+
