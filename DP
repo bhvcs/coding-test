@@ -1,3 +1,134 @@
 dp 삼각형에 어떤 정보를 담아야 하지? 
 어떤 정보를 담아야 뒤로 안돌아가지?
 여태까지의 최적의 결과를 구한다
+
+1. N으로 표현
+
+import java.util.*;
+
+class Solution{
+    public static int solution(int N, int number){
+        Set<Integer> set = new HashSet<>();
+        Set<Integer> newSet = new HashSet<>();
+        for(int i=1; i<9; i++){
+            newSet.add(getFirstNum(i, N));
+            Iterator<Integer> it = set.iterator();
+            while(it.hasNext()){
+                int num = it.next();
+                newSet.addAll(new HashSet<>(
+                    Arrays.asList(N+num, N-num, N*num,
+                                  num+N, num-N, num*N, num/N)));
+                if(num != 0) newSet.add(N/num);
+                // System.out.println(newSet);
+            }
+            System.out.println(newSet);
+            if(newSet.contains(number)) return i;
+            set = new HashSet<>(newSet);
+            newSet.clear();
+        }
+        return -1;
+        
+    }
+    public static int getFirstNum(int j, int N){
+        int n = 0;
+        for(int i=0; i< j; i++){
+            n += N * Math.pow(10, i);
+        }
+        // System.out.println(n);
+        return n;
+    }
+}
+이 코드로 했는데 안됨. 55 * 55를 만들 수 없기 때문임. 55 555 55
+
+다시 풀이했다. 7개의 숫자를 만들때 1 + 6 | 2 + 5 .. 등으로 만들겠다는 생각이 담긴 코드.
+import java.util.*;
+
+class Solution{
+    public static int solution(int N, int number){
+        HashMap<Integer, Set<Integer>> hm = new HashMap<>();
+        Set<Integer> newSet = new HashSet<>();
+        hm.put(1, new HashSet<>(Set.of(N)));
+        if(number == N) return 1;
+        for(int i=2; i<9; i++){
+            newSet.add(getFirstNum(i, N));
+            for(int j=1; j<=i/2; j++){
+                Iterator<Integer> it1 = hm.get(j).iterator();
+                while(it1.hasNext()){
+                    int a1 = it1.next();
+                    Iterator<Integer> it2 = hm.get(i-j).iterator();
+                    while(it2.hasNext()){
+                        int a2 = it2.next();
+                        newSet.addAll(new HashSet<>(Arrays.asList(a1+a2, a1-a2, a1*a2, a2+a1, a2-a1, a2*a1)));
+                        if(a1 != 0) newSet.add(a2/a1);
+                        if(a2 != 0) newSet.add(a1/a2);
+                    }
+                }
+            }
+            if(newSet.contains(number)) return i;
+            hm.put(i, new HashSet<>(newSet));
+            newSet.clear();
+        }
+        return -1;
+        
+    }
+    public static int getFirstNum(int j, int N){
+        int n = 0;
+        for(int i=0; i< j; i++){
+            n += N * Math.pow(10, i);
+        }
+        return n;
+    }
+}
+이 코드를 짜면서 배운점은, 이중 반복문을 할 때, iterator 선언을 이중 반복문 밖에다가 선언했었는데, 첫번째 반복문 안쪽에 iterator를 초기화해줘야 된다는 것이다.
+밖에다 하면, it2는 다시 처음으로 안돌아가니깐.
+그리고 다른 사람의 풀이를 봤는데 iterator로 돌 수 있는 것은 for-each로 돌아가는 것 같다.
+
+2. 정수 삼각형
+
+import java.util.*;
+
+class Solution{
+    public static int solution(int[][] triangle){
+        for(int i=1; i<triangle.length; i++){
+            for(int j=0; j<triangle[i].length; j++){
+                int a = 0, b = 0;
+                if(j-1 >= 0) a = triangle[i-1][j-1];
+                if(j < triangle[i-1].length) b = triangle[i-1][j];
+                triangle[i][j] += Math.max(a, b);
+            }
+        }
+        int max = 0;
+        for(int t: triangle[triangle.length-1]){
+            if(t > max) max = t;
+        }
+        return max;
+    }
+}
+
+각 위치에 도달할 떄까지의 최댓값들을 다 계산, 그 중 최댓값을 고른다. 사실 유튜브에서 영상으로 미리 봐서 쉽게 풀이했다.
+그리고 int의 최댓값을 구할 떄, stream을 이용한다면
+Arrays.stream(triangle[trianlge.length-1]).max.getAsInt() 로 구할 수 있다.
+
+3. 등굣길
+
+class Solution{
+    public static int solution(int m, int n, int[][] puddles){
+        int[][] map = new int[n+1][m+1];
+        for(int[] puddle: puddles){
+            map[puddle[1]][puddle[0]] = -1;
+        }
+        map[1][0] = 1; // 1, 1
+        for(int i=1; i<n+1; i++){
+            for(int j=1; j<m+1; j++){
+                if(map[i][j] == -1){
+                    map[i][j] = 0;
+                    continue;
+                }
+                map[i][j] = (map[i][j-1] + map[i-1][j]) % 1000000007;
+            }
+        }
+        return map[n][m];
+    }
+}
+처음에는 return 문에만 모듈러스 연산을 했다. 이 부분이 잘못된게, map을 채우는 과정에서 오버플로우가 발생할 수 있어서, 값을 넣을 때부터 모듈러스 연산을 했어야 했다.
+gpt의 도움을 받아서 해당 부분을 고쳤다.
