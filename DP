@@ -186,4 +186,26 @@ max[1][1]이 음수이므로 뒤에 붙는 것까지 부호를 역전시킬 수 
 너무 어려웠고, 다른 사람의 코드를 보고 약간 이해한 채로 작성한 식이다. 나중에 꼭 다시 보자...!
 
 
+5. 도둑질
 
+class Solution{
+    public static int solution(int[] money){
+        int len = money.length;
+        int[][] pick = new int[2][money.length];
+        pick[0][0] = money[0];
+        pick[0][1] = money[0];
+        pick[1][0] = 0;
+        pick[1][1] = money[1];
+        for(int i=2; i<money.length; i++){
+            pick[0][i] = Math.max(pick[0][i-2] + money[i], pick[0][i-1]);// 현재꺼를 뽑았을 떄 <> 안뽑았을 때 최댓값
+            pick[1][i] = Math.max(pick[1][i-2] + money[i], pick[1][i-1]);
+        }// 둘 나눈건 마지막꺼에 대한 처리가 필요하기 때문임
+        return Math.max(pick[0][len-2], pick[1][len-1]);
+    }
+}
+
+결론부터 얘기하면 풀이하지 못해서 남의 코드를 공부해서 거의 그대로 다시 적은 것이다.
+현재 순번의 집을 털지 말지 고민한다 했을 때, 경우의 수는 두가지가 있다. 
+전의 집을 털고 현재집을 털지 않았을 때의 값 <-> 전의 집을 털지 않고 현재집을 털었을 때의 최댓값 : 전에까지 최댓값을 잘 찾아왔다면 이 로직은 틀릴 수가 없음.
+이 방식으로 현재 집을 털지 말지 계속해서 찾아가는 상황이다. 
+4단계 dp문제는 전혀 감을 잡지도 못했다. dp 문제는 꾸준히 봐야할 것 같다.
