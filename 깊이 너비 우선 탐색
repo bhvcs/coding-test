@@ -1,0 +1,53 @@
+1. 타겟 넘버
+
+class Solution{
+    public static int count = 0;
+    public static int solution(int[] numbers, int target){
+        dfs(0, 0, target, numbers);
+        return count;
+    }
+    public static void dfs(int seq, int result, int target, int[] numbers){
+        if(seq == numbers.length){
+            if(result == target) count++;
+            return;
+        }
+        dfs(seq+1, result + numbers[seq], target, numbers);
+        dfs(seq+1, result - numbers[seq], target, numbers);
+        return;
+    }
+}
+
+모든 경우의 수를 다 봐야한다는 점에서 dfs를 활용한 코드를 작성했다.
+다른 사람의 풀이:
+if(seq == numbers.length){
+  if(result == target) return 1;
+  else return 0;
+}
+return dfs(seq+1, result + numbers[seq], target, numbers) + dfs(seq+1, result - numbers[seq], target, numbers);
+이렇게 하면 전역변수를 굳이 사용하지 않아도 된다.
+
+2. 네트워크
+
+class Solution{
+    public static int solution(int n, int[][] computers){
+        boolean[] visited = new boolean[n];
+        int answer = 0;
+        for(int i=0; i<n; i++){
+            if(visited[i]) continue;
+            bfs(i, visited, n, computers);
+            answer++;
+        }
+        return answer;
+    }
+    public static void bfs(int seq, boolean[] visited, int n, int[][] computers){
+        visited[seq] = true;
+        for(int i=0; i<n; i++){
+            if(seq == i) continue; // 같은 컴퓨터
+            if(computers[seq][i] == 1 && !visited[i]) bfs(i, visited, n, computers);// 연결되어있고 아직 방문하지 않음.
+        }
+    }
+}
+
+visited 배열만 다 true로 바꿔주면 끝나는 문제이다. return 값을 줄 필요 없이 방문만 체크하면 된다는 것이다.
+bfs를 호출시켜놓고 answer++을 하는 부분이 최근 코테풀이에서는 익숙지 않은 흐름이었다.
+
