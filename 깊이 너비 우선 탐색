@@ -51,3 +51,102 @@ class Solution{
 visited 배열만 다 true로 바꿔주면 끝나는 문제이다. return 값을 줄 필요 없이 방문만 체크하면 된다는 것이다.
 bfs를 호출시켜놓고 answer++을 하는 부분이 최근 코테풀이에서는 익숙지 않은 흐름이었다.
 
+3. 게임 맴 최단거리
+import java.util.*;
+class Solution{
+    public int minResult;
+    public int solution(int[][] maps){
+        int maxLen = 0;
+        int n = maps.length;
+        int m = maps[0].length;
+        int[][] history = new int[n][m];
+            
+        for(int[] map: maps){
+            for(int ma: map){
+                if(ma == 1){
+                    maxLen++;
+                }
+            }
+        }
+        
+        minResult = maxLen+1;
+        
+        dfs(maps, history, 0, 0, 1, n-1, m-1);
+        if(minResult == maxLen+1)
+            return -1;
+        return minResult;
+    }
+    public void dfs(int[][] maps, int[][] history, int y, int x, int currentLen, int n, int m){
+        history[y][x] = 1;
+        if(currentLen >= minResult)
+            return;
+        if(y == n && x == m){
+            minResult = currentLen;
+            return;
+        }
+        if(y+1 <= n && maps[y+1][x] == 1 && history[y+1][x] == 0){
+            dfs(maps, history, y+1, x, currentLen+1, n, m);
+            history[y+1][x] = 0;
+        }
+        if(x+1 <= m && maps[y][x+1] == 1 && history[y][x+1] == 0){
+            dfs(maps, history, y, x+1, currentLen+1, n, m);
+            history[y][x+1] = 0;
+        }
+        if(y-1 >= 0 && maps[y-1][x] == 1 && history[y-1][x] == 0){
+            dfs(maps, history, y-1, x, currentLen+1, n, m);
+            history[y-1][x] = 0;
+        }
+        if(x-1 >= 0 && maps[y][x-1] == 1 && history[y][x-1] == 0){
+            dfs(maps, history, y, x-1, currentLen+1, n, m);
+            history[y][x-1] = 0;
+        }
+        return;
+    }
+}
+내 처음 풀이는 이렇다. history로 왔던 곳을 다시 가지 않도록 하려했고 시간을 줄이기 위해 여러 수정작업을 거쳤지만, 결국 시간초과가 됐다.
+시간을 줄이기 위해 여러 조건들을 시도했지만 효율성 테스트를 통과하지 못했다. 다른 사람의 풀이를 보니 재귀를 사용하지 않고서 풀이했다.
+
+일단 반복문에서 queue를 쓰면 한 지점에서 갈 수 있는 방향을 동시에 검사할 수 있게된다. 재귀와 stack은 계속 깊게 파고 들어가는 느낌.
+최단 거리 => 모든 방향을 확인하면서 간다 => 깊게 들어가는 것과 다름.
+
+import java.util.*;
+class Solution{
+    public int solution(int[][] maps){
+        int n = maps.length;
+        int m = maps[0].length;
+        Queue<int[]> queue = new LinkedList<>();
+        int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+            
+        // for(int[] map: maps){
+        //     for(int ma: map){
+        //         if(ma == 1){
+        //             maxLen++;
+        //         }
+        //     }
+        // } 왔던 길을 다시 되돌아가지만 않으면 최대 거리보다 많아질 일은 없음
+        queue.offer(new int[]{0, 0, 1});
+        maps[0][0] = 0;
+        while(!queue.isEmpty()){
+            int[] point = queue.poll();
+            int x = point[0];
+            int y = point[1];
+            int distance = point[2];
+            if(x == m-1 && y == n-1){
+                return distance;
+            }
+            for(int[] direction: directions){
+                int newX = x + direction[0];
+                int newY = y + direction[1];
+                if(0 <= newX && newX < m && 0 <= newY && newY < n && maps[newY][newX] == 1){
+                    maps[newY][newX] = 0;
+                    queue.offer(new int[]{newX, newY, distance+1});   
+                }
+            }
+        }
+        return -1;
+    }
+        
+}
+이렇게 바꾸었다. 근데 이렇게 바꿀 때도 문제가 있었다. maps[newY][newX] = 0; 이 한줄을 for문 전에 했던 것. 솔직히 상관 없을 줄 알았다.
+시간 초과가 나길래 생각해보니, while문 반복이 깊어질수록, 뻗어 나간 가지끼리 겹치는 경우가 생기게 된다는 것. 이게 반복이 많아질수록 더 심화될 것임.
+그래서 아래쪽에 두는게 맞다.
